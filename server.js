@@ -1,4 +1,7 @@
 // server.js
+"use strict";
+/* jshint node: true */
+/* jshint loopfunc:true */
 
 // BASE SETUP
 // =============================================================================
@@ -32,7 +35,7 @@ router.use(function(req, res, next){
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
-    res.json({ message: 'hooray! welcome to our api!' });   
+    res.json("test working222");   
 });
 
 // more routes for our API will happen here
@@ -45,14 +48,20 @@ router.route('/bears')
     .post(function(req, res){
 
         var bear = new Bear();      // create a new instance of the Bear model
+
+        // START: hardcoded go get values for testing
+
+
+        // END: hardcoded go get values for testing
         bear.name = req.body.name;  // set the bears name (comes from the request)
+        bear.color = req.body.color;    // sets the bears color
 
         // save the bear and check for erros
         bear.save(function(err){
             if (err)
                 res.send(err);
 
-            res.json({ message: 'Bear created!' });
+            res.json(bear);
         });
 
     })
@@ -61,8 +70,31 @@ router.route('/bears')
         Bear.find(function(err, bears) {
             if (err)
                 res.send(err);
-
+            
             res.json(bears);
+        });
+    })
+
+    // delete all bears
+    .delete(function(req, res){
+
+        Bear.find(function(err, bears) {
+            if (err)
+                res.send(err);
+            
+             
+            // loop each bear and remove them
+            for (let bear of bears){
+                console.log(bear.bear_id);
+                Bear.remove({
+                    _id: bear.bear_id
+                }, function(err){
+                if(err)
+                    res.send(err);
+             });
+            }
+
+            res.json({ message: 'Successfully delete all bears'});
         });
     });
 
@@ -105,7 +137,7 @@ router.route('/bears/:bear_id')
     .delete(function(req, res){
         Bear.remove({
             _id: req.params.bear_id
-        }, function(err, bear) {
+        }, function(err) {
             if (err)
                 res.send(err);
 
